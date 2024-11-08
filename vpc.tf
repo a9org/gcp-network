@@ -1,4 +1,4 @@
 resource "google_compute_network" "this" {
-  name                    = "vpc-${locals.prefix_name}"
+  name                    = "vpc-${local.prefix_name}"
   auto_create_subnetworks = false
 }

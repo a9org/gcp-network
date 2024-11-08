@@ -1,9 +1,9 @@
 resource "google_compute_instance" "nat_server" {
   count        = var.nat_type == "natserver" && var.multi_az ? 3 : (var.nat_type == "natserver" ? 1 : 0)
-  name         = "ec2-${locals.prefix_name}-nat-${count.index + 1}"
+  name         = "ec2-${local.prefix_name}-nat-${count.index + 1}"
   machine_type = var.nat_instance
   zone         = "${var.region}${count.index % 3 + 1}-a"
-  tags         = ["ec2-${locals.prefix_name}-nat-${count.index + 1}"]
+  tags         = ["ec2-${local.prefix_name}-nat-${count.index + 1}"]
 
 
   boot_disk {
@@ -30,7 +30,7 @@ resource "google_compute_instance" "nat_server" {
 
 resource "google_compute_router" "nat_router" {
   count   = var.nat_type == "natgateway" && var.multi_az ? 3 : (var.nat_type == "natgateway" ? 1 : 0)
-  name    = "nat-${locals.prefix_name}-${count.index + 1}"
+  name    = "nat-${local.prefix_name}-${count.index + 1}"
   region  = "${var.region}${count.index + 1}"
   network = google_compute_network.vpc_network.id
 }
