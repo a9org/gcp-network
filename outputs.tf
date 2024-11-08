@@ -5,15 +5,15 @@ output "vpc_id" {
 
 output "subnets_public" {
     description = "Public Subnets"
-    value = google_compute_subnetwork.subnet_public.*.id
+    value = google_compute_subnetwork.public.*.ID
 }
 
 output "subnets_private" {
     description = "Private Subnets"
-    value = google_compute_subnetwork.subnet_private.*.id
+    value = google_compute_subnetwork.private.*.ID
 }
 
 output "subnets_restric" {
     description = "Restricted Subnets"
-    value = google_compute_subnetwork.subnet_restricted.*.id
+    value = google_compute_subnetwork.private.*.ID
 }
