@@ -1,44 +1,102 @@
-# GCP Network Infrastructure with Terraform
+# GCP Network Infrastructure Terraform Module
 
-This Terraform configuration is used to create a network infrastructure on Google Cloud Platform (GCP). It includes the creation of a VPC, multiple subnets (public, private, and restricted), and NAT services (either NAT server or NAT gateway). The configuration is flexible, allowing for customization through various variables.
+This repository provides a Terraform module to create and manage network infrastructure on Google Cloud Platform (GCP). It includes creating a VPC, public, private, and restricted subnets, and configuring NAT services, allowing flexible and secure network setups for various application environments.
 
-## Features
+## Table of Contents
 
-- **VPC**: Creates a Virtual Private Cloud (VPC) to host all the subnets.
-- **Subnets**: Configures public, private, and restricted subnets in multiple availability zones.
-- **NAT Services**: Provides two options for NAT:
-  - **NAT Server**: Uses a compute instance with `iptables` for packet forwarding.
-  - **NAT Gateway**: Uses Google Cloud's NAT Gateway service.
-- **Multi-AZ Support**: Optionally deploy NAT services across multiple availability zones.
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Prerequisites](#prerequisites)
+- [Variables](#variables)
+- [Outputs](#outputs)
+- [Usage](#usage)
+  - [Module Example](#module-example)
+- [Cleanup](#cleanup)
+- [License](#license)
+- [Author](#author)
+
+## Overview
+
+This Terraform module sets up a robust network infrastructure on GCP, including a VPC with configurable subnets across multiple availability zones and NAT options. This allows scalable, segmented, and secure network setups across different environments (e.g., development, staging, production).
+
+## Architecture
+
+The network infrastructure includes the following components:
+
+- **VPC**: A Virtual Private Cloud to host all the subnets.
+- **Subnets**: Configurable public, private, and restricted subnets distributed across availability zones.
+- **NAT**: Two options for NAT:
+  - **NAT Server**: A compute instance configured with `iptables` for packet forwarding.
+  - **NAT Gateway**: GCP's managed NAT Gateway service.
+- **Multi-AZ**: NAT resources can be deployed across multiple availability zones.
 
 ## Prerequisites
 
-- **Terraform**: Ensure you have Terraform installed. Version >= 1.0 is recommended.
-- **GCP Credentials**: Set up your GCP credentials. You can use a service account key with appropriate permissions.
+- **Terraform**: Ensure that Terraform is installed (version >= 1.0 recommended).
+- **GCP Credentials**: Set up GCP credentials with a service account that has the necessary permissions to manage network resources.
+- **GCP APIs**: Enable the following APIs in your GCP project:
+  - Compute Engine API
+  - Cloud Resource Manager API
 
 ## Variables
 
+This module supports the following variables for customization:
+
 ### Required Variables
 
-- **`cidr`**: CIDR range for the VPC (e.g., `10.16.0.0/16`).
-- **`subnet_types`**: List of subnet types to create (e.g., `["public", "private"]`).
-- **`nat_type`**: Type of NAT to create (`natserver` or `natgateway`).
-- **`region`**: The region where the resources will be created.
-- **`owner`**: The owner of the infrastructure resources.
-- **`project`**: The project name associated with the infrastructure resources.
-- **`environment`**: The environment type (`development`, `staging`, `production`).
+- `cidr`: CIDR for the VPC (e.g., `10.16.0.0/16`).
+- `subnet_types`: List of subnet types to create (e.g., `["public", "private"]`).
+- `nat_type`: Type of NAT to use (`natserver` or `natgateway`).
+- `region`: The region where resources are created.
+- `owner`: The owner of the infrastructure resources.
+- `project`: Project name associated with the infrastructure.
+- `environment`: Type of environment (e.g., `development`, `staging`, `production`).
 
 ### Optional Variables
 
-- **`multi_az`**: Whether to create NAT in multiple AZs (default: `false`).
-- **`labels`**: List of additional labels to apply to resources.
-- **`subnets`**: List of subnets to create (`public`, `private`, `restrict`). Default is all three.
-- **`subnet_tier_public`**: CIDR offsets for public subnets (default: `0.0`, `1.0`, `2.0`).
-- **`subnet_tier_private`**: CIDR offsets for private subnets (default: `10.0`, `11.0`, `12.0`).
-- **`subnet_tier_restrict`**: CIDR offsets for restricted subnets (default: `20.0`, `21.0`, `22.0`).
-- **`nat_instance`**: The machine type for NAT server instances (default: `f1.micro`).
+- `multi_az`: Whether to create NAT in multiple AZs (default: `false`).
+- `labels`: Additional labels to apply to resources.
+- `subnets`: List of subnets to create (`public`, `private`, `restrict`). Defaults to all three.
+- `subnet_tier_public`: CIDR offsets for public subnets.
+- `subnet_tier_private`: CIDR offsets for private subnets.
+- `subnet_tier_restrict`: CIDR offsets for restricted subnets.
+- `nat_instance`: Machine type for NAT server instances (default: `e2-micro`).
+
+For more details, see `variables.tf`.
+
+## Outputs
+
+The module provides the following outputs:
+
+- `vpc_id`: The ID of the created VPC.
+- `subnets_public`: IDs of the created public subnets.
+- `subnets_private`: IDs of the created private subnets.
+- `subnets_restrict`: IDs of the created restricted subnets.
+- `nat_public_ips`: Public IPs for NAT, depending on `nat_type` (`natserver` or `natgateway`).
+
+For additional details, refer to `outputs.tf`.
 
 ## Usage
+
+### Module Example
+
+To use this module in your Terraform configuration, reference it as follows:
+
+```hcl
+module "gcp_network" {
+  source       = "git@github.com:a9org/gcp-network.git"
+  cidr         = "10.16.0.0/16"
+  region       = "us-central1"
+  owner        = "your_name"
+  project      = "your_project"
+  environment  = "production"
+  subnet_types = ["public", "private"]
+  nat_type     = "natgateway"
+  multi_az     = true
+}
+```
+
+### Standalone Usage
 
 1. **Clone the Repository**
 
@@ -53,19 +111,19 @@ This Terraform configuration is used to create a network infrastructure on Googl
    terraform init
    ```
 
-3. **Customize Variables**
+3. **Configure Variables**
 
-   Create a `terraform.tfvars` file to customize the required variables:
+   Create a `terraform.tfvars` file and define the required variables:
 
    ```hcl
-   region     = "us-central1"
-   owner      = "your_name"
-   project    = "your_project"
-   environment = "production"
-   cidr       = "10.16.0.0/16"
+   region       = "us-central1"
+   owner        = "your_name"
+   project      = "your_project"
+   environment  = "production"
+   cidr         = "10.16.0.0/16"
    subnet_types = ["public", "private"]
-   nat_type   = "natgateway"
-   multi_az   = true
+   nat_type     = "natgateway"
+   multi_az     = true
    ```
 
 4. **Apply the Configuration**
@@ -78,16 +136,6 @@ This Terraform configuration is used to create a network infrastructure on Googl
 
    Review the changes and confirm with `yes` to apply them.
 
-## Outputs
-
-- **VPC and Subnet Details**: Outputs relevant information about the VPC and subnets created.
-- **NAT Information**: If NAT services are created, the output will include their details.
-
-## Notes
-
-- **NAT Server vs NAT Gateway**: Depending on the value provided for `nat_type`, the deployment will create either a NAT server (using a Compute Instance) or a NAT Gateway (using Google's managed service).
-- **Multi-AZ Support**: If `multi_az` is set to `true`, NAT resources will be created in each availability zone and private subnets will route through the corresponding NAT.
-
 ## Cleanup
 
 To destroy the infrastructure created by this Terraform configuration, run:
@@ -96,7 +144,7 @@ To destroy the infrastructure created by this Terraform configuration, run:
 terraform destroy
 ```
 
-Confirm with `yes` to proceed with the deletion of all resources.
+Confirm with `yes` to proceed with deletion.
 
 ## License
 
@@ -105,4 +153,3 @@ This project is licensed under the MIT License. See the LICENSE file for more de
 ## Author
 
 - **Rafael Botelho** - Initial work and Terraform configuration.
-
