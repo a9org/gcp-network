@@ -2,7 +2,7 @@ resource "google_compute_instance" "nat_server" {
   count        = var.nat_type == "natserver" && var.multi_az ? 3 : (var.nat_type == "natserver" ? 1 : 0)
   name         = "ec2-${local.prefix_name}-nat-${count.index + 1}"
   machine_type = var.nat_instance
-  zone         = "${var.region}${count.index % 3 + 1}-a"
+  zone         = "${var.region}${local.zonas[count.index]}"
   tags         = ["ec2-${local.prefix_name}-nat-${count.index + 1}"]
 
 
@@ -31,7 +31,7 @@ resource "google_compute_instance" "nat_server" {
 resource "google_compute_router" "nat_router" {
   count   = var.nat_type == "natgateway" && var.multi_az ? 3 : (var.nat_type == "natgateway" ? 1 : 0)
   name    = "nat-${local.prefix_name}-${count.index + 1}"
-  region  = "${var.region}${count.index + 1}"
+  region  = "${var.region}"
   network = google_compute_network.this.id
 }
 
@@ -39,7 +39,7 @@ resource "google_compute_router_nat" "nat" {
   count                  = var.nat_type == "natgateway" && var.multi_az ? 3 : (var.nat_type == "natgateway" ? 1 : 0)
   name                   = "nat-${count.index + 1}"
   router                 = google_compute_router.nat_router[count.index].name
-  region                 = "${var.region}${count.index + 1}"
+  region                 = "${var.region}"
   nat_ip_allocate_option = "AUTO_ONLY"
 
   source_subnetwork_ip_ranges_to_nat = "LIST_OF_SUBNETWORKS"
