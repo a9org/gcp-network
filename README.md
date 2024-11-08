@@ -72,6 +72,9 @@ The module provides the following outputs:
 - `subnets_public`: IDs of the created public subnets.
 - `subnets_private`: IDs of the created private subnets.
 - `subnets_restrict`: IDs of the created restricted subnets.
+- `subnets_public_self_link`: Public Subnets Self Link
+- `subnets_private_self_link`: Private Subnets Self Link
+- `subnets_restrict_self_link`: Restricted Subnets Self Link
 - `nat_public_ips`: Public IPs for NAT, depending on `nat_type` (`natserver` or `natgateway`).
 
 For additional details, refer to `outputs.tf`.
