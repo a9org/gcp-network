@@ -20,5 +20,5 @@ output "subnets_restric" {
 
 output "nat_public_ips" {
     description = "NAT Public IPs"
-    value = (var.nat_type == "natserver") ? google_compute_address.nat.*.address : google_compute_router_nat.nat.*.nat_ip   
+    value = (var.nat_type == "natserver") ? google_compute_instance.nat_server.*.network_interface.0.access_config.0.nat_ip : google_compute_router_nat.nat_gateway.nat_ips
 }
