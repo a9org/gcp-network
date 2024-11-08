@@ -1,8 +1,8 @@
 locals {
   common_tags = {
-    Owner       = var.owner
-    Project     = var.project
-    Environment = var.environment
+    owner       = var.owner
+    project     = var.project
+    environment = var.environment
   }
 
   prefix_name = "${var.project}-${var.environment}"
