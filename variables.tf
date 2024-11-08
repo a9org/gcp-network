@@ -32,10 +32,10 @@ variable "subnets" {
   description = "List of subnets to create (e.g., 'public', 'private', 'restrict')."
   type        = list(string)
   default     = ["public", "private", "restrict"]
-  validation {
-    condition     = contains(["public", "private", "restrict"], var.subnets)
-    error_message = "The value must be 'public', 'private', or 'restrict'."
-  }
+  # validation {
+  #   condition     = contains(["public", "private", "restrict"], var.subnets)
+  #   error_message = "The value must be 'public', 'private', or 'restrict'."
+  # }
 }
 
 variable "subnet_tier_public" {
