@@ -13,8 +13,8 @@ resource "google_compute_instance" "nat_server" {
   }
 
   network_interface {
-    network    = google_compute_network.vpc_network.id
-    subnetwork = element([for s in google_compute_subnetwork.subnets : s if s.labels.tier == "public"], count.index).name
+    network    = google_compute_network.this.id
+    subnetwork = element([for s in google_compute_subnetwork.private : s], count.index).name
     access_config {
     }
   }
@@ -32,7 +32,7 @@ resource "google_compute_router" "nat_router" {
   count   = var.nat_type == "natgateway" && var.multi_az ? 3 : (var.nat_type == "natgateway" ? 1 : 0)
   name    = "nat-${local.prefix_name}-${count.index + 1}"
   region  = "${var.region}${count.index + 1}"
-  network = google_compute_network.vpc_network.id
+  network = google_compute_network.this.id
 }
 
 resource "google_compute_router_nat" "nat" {
