@@ -1,9 +1,9 @@
 resource "google_compute_instance" "nat_server" {
-  count  = var.nat_type == "natserver" && var.multi_az ? 3 : (var.nat_type == "natserver" ? 1 : 0)
-  name   = "ec2-${locals.prefix_name}-nat-${count.index + 1}"
+  count        = var.nat_type == "natserver" && var.multi_az ? 3 : (var.nat_type == "natserver" ? 1 : 0)
+  name         = "ec2-${locals.prefix_name}-nat-${count.index + 1}"
   machine_type = var.nat_instance
-  zone   = "${var.zone}${count.index % 3 + 1}-a"
-  tags   = ["ec2-${locals.prefix_name}-nat-${count.index + 1}"]
+  zone         = "${var.region}${count.index % 3 + 1}-a"
+  tags         = ["ec2-${locals.prefix_name}-nat-${count.index + 1}"]
 
 
   boot_disk {
@@ -13,8 +13,8 @@ resource "google_compute_instance" "nat_server" {
   }
 
   network_interface {
-    network       = google_compute_network.vpc_network.id
-    subnetwork    = element([for s in google_compute_subnetwork.subnets : s if s.labels.tier == "public"], count.index).name
+    network    = google_compute_network.vpc_network.id
+    subnetwork = element([for s in google_compute_subnetwork.subnets : s if s.labels.tier == "public"], count.index).name
     access_config {
     }
   }
@@ -29,24 +29,24 @@ resource "google_compute_instance" "nat_server" {
 }
 
 resource "google_compute_router" "nat_router" {
-  count  = var.nat_type == "natgateway" && var.multi_az ? 3 : (var.nat_type == "natgateway" ? 1 : 0)
-  name   = "nat-${locals.prefix_name}-${count.index + 1}"
-  region = "${var.zone}${count.index + 1}"
+  count   = var.nat_type == "natgateway" && var.multi_az ? 3 : (var.nat_type == "natgateway" ? 1 : 0)
+  name    = "nat-${locals.prefix_name}-${count.index + 1}"
+  region  = "${var.region}${count.index + 1}"
   network = google_compute_network.vpc_network.id
 }
 
 resource "google_compute_router_nat" "nat" {
-  count               = var.nat_type == "natgateway" && var.multi_az ? 3 : (var.nat_type == "natgateway" ? 1 : 0)
-  name                = "nat-${count.index + 1}"
-  router              = google_compute_router.nat_router[count.index].name
-  region              = "${var.zone}${count.index + 1}"
+  count                  = var.nat_type == "natgateway" && var.multi_az ? 3 : (var.nat_type == "natgateway" ? 1 : 0)
+  name                   = "nat-${count.index + 1}"
+  router                 = google_compute_router.nat_router[count.index].name
+  region                 = "${var.region}${count.index + 1}"
   nat_ip_allocate_option = "AUTO_ONLY"
 
   source_subnetwork_ip_ranges_to_nat = "LIST_OF_SUBNETWORKS"
   dynamic "subnetwork" {
     for_each = [for s in google_compute_subnetwork.private : s]
     content {
-      name                   = subnetwork.value.name
+      name                    = subnetwork.value.name
       source_ip_ranges_to_nat = ["ALL_IP_RANGES"]
     }
   }

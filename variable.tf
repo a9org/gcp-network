@@ -1,56 +1,73 @@
-variable "zone" {
-    description = "value"
-    type = string
+variable "region" {
+  description = "The region where the resources will be created."
+  type        = string
 }
 
 variable "owner" {
-    description = "value"
-    type = string
+  description = "The owner of the infrastructure resources."
+  type        = string
 }
 
 variable "project" {
-    description = "value"
-    type = string
+  description = "The project name associated with the infrastructure resources."
+  type        = string
 }
 
 variable "environment" {
-    description = "value"
-    type = string
+  description = "The environment type (e.g., 'development', 'staging', 'production')."
+  type        = string
+}
+
+variable "labels" {
+  description = "List of additional labels to apply to resources."
+  type        = list(string)
 }
 
 variable "cidr" {
-    description = "value"
-    type = string
-    default = "10.10.0.0/16"
+  description = "CIDR range for the VPC (e.g., '10.16.0.0/16')"
+  type        = string
+}
+
+variable "subnet_types" {
+  description = "List of subnet types to create (e.g., [\"public\", \"private\"])"
+  type        = list(string)
 }
 
 variable "subnets" {
-    description = "value"
-    type = list(string)
-    default = ["public", "private", "restrict"]
+  description = "List of subnets to create (e.g., 'public', 'private', 'restrict')."
+  type        = list(string)
+  default     = ["public", "private", "restrict"]
+  validation {
+    condition     = contains(["public", "private", "restrict"], var.subnets)
+    error_message = "The value must be 'public', 'private', or 'restrict'."
+  }
 }
 
 variable "subnet_tier_public" {
-    description = "value"
-    type = list(string)
-    default = ["0.0", "1.0", "2.0"]
+  description = "CIDR offsets for public subnets."
+  type        = list(string)
+  default     = ["0.0", "1.0", "2.0"]
 }
 
 variable "subnet_tier_private" {
-    description = "value"
-    type = list(string)
-    default = ["10.0", "11.0", "12.0"]
+  description = "CIDR offsets for private subnets."
+  type        = list(string)
+  default     = ["10.0", "11.0", "12.0"]
 }
 
 variable "subnet_tier_restrict" {
-    description = "value"
-    type = list(string)
-    default = ["20.0", "21.0", "22.0"]
+  description = "CIDR offsets for restricted subnets."
+  type        = list(string)
+  default     = ["20.0", "21.0", "22.0"]
 }
 
 variable "nat_type" {
   description = "Type of NAT to create (e.g., 'natserver' or 'natgateway')"
   type        = string
+  validation {
+    condition     = contains(["natserver", "natgateway"], var.nat_type)
+    error_message = "Invalid NAT type. Must be 'natserver' or 'natgateway'."
+  }
 }
 
 variable "multi_az" {
@@ -60,7 +77,7 @@ variable "multi_az" {
 }
 
 variable "nat_instance" {
-    description = "value"
-    type = string
-    default = "f1.micro"
+  description = "The machine type for NAT server instances."
+  type        = string
+  default     = "f1.micro"
 }
