@@ -28,11 +28,6 @@ variable "cidr" {
   type        = string
 }
 
-variable "subnet_types" {
-  description = "List of subnet types to create (e.g., [\"public\", \"private\"])"
-  type        = list(string)
-}
-
 variable "subnets" {
   description = "List of subnets to create (e.g., 'public', 'private', 'restrict')."
   type        = list(string)
@@ -64,6 +59,7 @@ variable "subnet_tier_restrict" {
 variable "nat_type" {
   description = "Type of NAT to create (e.g., 'natserver' or 'natgateway')"
   type        = string
+  default     = "natserver"
   validation {
     condition     = contains(["natserver", "natgateway"], var.nat_type)
     error_message = "Invalid NAT type. Must be 'natserver' or 'natgateway'."
