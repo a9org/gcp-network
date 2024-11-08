@@ -75,5 +75,5 @@ variable "multi_az" {
 variable "nat_instance" {
   description = "The machine type for NAT server instances."
   type        = string
-  default     = "e2.micro"
+  default     = "e2-micro"
 }
