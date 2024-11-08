@@ -3,7 +3,7 @@ resource "google_compute_subnetwork" "public" {
 
   name          = "sbn-${local.prefix_name}-public-${count.index}"
   ip_cidr_range = format("%s.%s.%s/%s", element(local.CIDR, 0), element(local.CIDR, 1), var.subnet_tier_public[count.index], "24")
-  region        = "${var.region}${local.zonas[count.index]}"
+  region        = "${var.region}"
   network       = google_compute_network.this.id
 }
 
@@ -12,7 +12,7 @@ resource "google_compute_subnetwork" "private" {
 
   name          = "sbn-${local.prefix_name}-private-${count.index}"
   ip_cidr_range = format("%s.%s.%s/%s", element(local.CIDR, 0), element(local.CIDR, 1), var.subnet_tier_private[count.index], "24")
-  region        = "${var.region}${local.zonas[count.index]}"
+  region        = "${var.region}"
   network       = google_compute_network.this.id
 }
 
@@ -21,6 +21,6 @@ resource "google_compute_subnetwork" "restrict" {
 
   name          = "sbn-${local.prefix_name}-restrict-${count.index}"
   ip_cidr_range = format("%s.%s.%s/%s", element(local.CIDR, 0), element(local.CIDR, 1), var.subnet_tier_restrict[count.index], "24")
-  region        = "${var.region}${local.zonas[count.index]}"
+  region        = "${var.region}"
   network       = google_compute_network.this.id
 }
