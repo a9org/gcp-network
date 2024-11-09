@@ -3,6 +3,11 @@ output "vpc_id" {
     value = google_compute_network.this.id
 }
 
+output "vpc_self_link" {
+    description = "VPC Self Link"
+    value = google_compute_network.this.self_link
+}
+
 output "subnets_public" {
     description = "Public Subnets"
     value = google_compute_subnetwork.public.*.id

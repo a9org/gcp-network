@@ -69,6 +69,7 @@ For more details, see `variables.tf`.
 The module provides the following outputs:
 
 - `vpc_id`: The ID of the created VPC.
+- `vpc_self_link`: VPC Self Link
 - `subnets_public`: IDs of the created public subnets.
 - `subnets_private`: IDs of the created private subnets.
 - `subnets_restrict`: IDs of the created restricted subnets.
